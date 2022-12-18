@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Title</title>
+</head>
+<body>
+<div>
+  <main id="app" @click.stop.passive.once="change('weid')" style="border: 2px solid #8a8a8a;border-radius: 10px;" @notify="getNotify">
+    {{computeSum}}
+    <h2 @click.stop="clickH2">点击H2</h2>
+  </main>
+</div>
+</body>
+<script src="./dist/vue.js"></script>
+<script>
+  const vue2 = new Vue({
+    el: '#app',
+    components: {},
+    provide: {
+      getParentName: '父名称',
+      getGrandpaName: '祖父名称'
+    },
+    inject: {
+      getRootName: ['getParentName', 'getGrandpaName']
+    },
+    data() {
+      return {
+        count: 1,
+      }
+    },
+    methods: {
+      change() {
+        this.$emit('notify')
+        this.count++
+      },
+      getNotify() {
+        console.log('getNotify')
+      },
+      clickH2() {
+        console.log('CLICK H2')
+      }
+    },
+    computed: {
+      computeSum() {
+        return this.count + 1
+      },
+    }
+  })
+</script>
+</html>
