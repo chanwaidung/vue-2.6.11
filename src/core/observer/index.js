@@ -43,6 +43,7 @@ export class Observer {
     this.value = value
     this.dep = new Dep()
     this.vmCount = 0
+    // 给当前value打上__ob__标志位，标记当前数据已为响应式数据
     def(value, '__ob__', this)
     if (Array.isArray(value)) {
       if (hasProto) {
