@@ -5,11 +5,15 @@ import { noop } from 'shared/util'
 import { handleError } from './error'
 import { isIE, isIOS, isNative } from './env'
 
+// 全局变量决定当前使用哪种队列：优先使用微队列
 export let isUsingMicroTask = false
 
+// $nextTick回调队列
 const callbacks = []
+// 标志当前是否正在执行nextTick回调
 let pending = false
 
+// 遍历callbacks, 并执行callback函数
 function flushCallbacks () {
   pending = false
   const copies = callbacks.slice(0)
@@ -30,6 +34,7 @@ function flushCallbacks () {
 // where microtasks have too high a priority and fire in between supposedly
 // sequential events (e.g. #4521, #6690, which have workarounds)
 // or even between bubbling of the same event (#6566).
+// 定义宏任务、微任务包装函数
 let timerFunc
 
 // The nextTick behavior leverages the microtask queue, which can be accessed
@@ -39,6 +44,7 @@ let timerFunc
 // completely stops working after triggering a few times... so, if native
 // Promise is available, we will use it:
 /* istanbul ignore next, $flow-disable-line */
+// 是否原生支持Promise
 if (typeof Promise !== 'undefined' && isNative(Promise)) {
   const p = Promise.resolve()
   timerFunc = () => {
@@ -51,7 +57,9 @@ if (typeof Promise !== 'undefined' && isNative(Promise)) {
     if (isIOS) setTimeout(noop)
   }
   isUsingMicroTask = true
-} else if (!isIE && typeof MutationObserver !== 'undefined' && (
+}
+// 是否原生支持MutationObserver
+else if (!isIE && typeof MutationObserver !== 'undefined' && (
   isNative(MutationObserver) ||
   // PhantomJS and iOS 7.x
   MutationObserver.toString() === '[object MutationObserverConstructor]'
@@ -70,14 +78,18 @@ if (typeof Promise !== 'undefined' && isNative(Promise)) {
     textNode.data = String(counter)
   }
   isUsingMicroTask = true
-} else if (typeof setImmediate !== 'undefined' && isNative(setImmediate)) {
+}
+// 是否原生支持setImmediate
+else if (typeof setImmediate !== 'undefined' && isNative(setImmediate)) {
   // Fallback to setImmediate.
   // Technically it leverages the (macro) task queue,
   // but it is still a better choice than setTimeout.
   timerFunc = () => {
     setImmediate(flushCallbacks)
   }
-} else {
+}
+// 都不支持则直接降级为: setTimeout
+else {
   // Fallback to setTimeout.
   timerFunc = () => {
     setTimeout(flushCallbacks, 0)
@@ -97,12 +109,14 @@ export function nextTick (cb?: Function, ctx?: Object) {
       _resolve(ctx)
     }
   })
+  // pending = false时, 立即执行回调队列
   if (!pending) {
     pending = true
     timerFunc()
   }
   // $flow-disable-line
   if (!cb && typeof Promise !== 'undefined') {
+    // 当不传cb时, 可以使用.then函数
     return new Promise(resolve => {
       _resolve = resolve
     })
