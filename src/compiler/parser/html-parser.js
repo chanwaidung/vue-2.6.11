@@ -186,6 +186,7 @@ export function parseHTML (html, options) {
 
   function parseStartTag () {
     const start = html.match(startTagOpen)
+    console.log('start: ', start)
     if (start) {
       const match = {
         tagName: start[1],
@@ -195,6 +196,7 @@ export function parseHTML (html, options) {
       advance(start[0].length)
       let end, attr
       while (!(end = html.match(startTagClose)) && (attr = html.match(dynamicArgAttribute) || html.match(attribute))) {
+        console.log('end: ', end)
         attr.start = index
         advance(attr[0].length)
         attr.end = index

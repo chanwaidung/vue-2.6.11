@@ -6,7 +6,7 @@
 </head>
 <body>
 <div>
-  <main id="app" @click.stop.passive.once="change('weid')" style="border: 2px solid #8a8a8a;border-radius: 10px;" @notify="getNotify">
+  <main id="app"  @click.stop.passive.once="change('weid')" style="border: 2px solid #8a8a8a;border-radius: 10px;" @notify="getNotify">
     {{computeSum}}
     <h2 @click.stop="clickH2">点击H2</h2>
   </main>
